@@ -29,8 +29,6 @@ def process_response_data(response_data):
     holidays = []
 
     if isinstance(response_data, dict):
-        #  {"mentors": [...], "holidays": [...], "postcards": [...]}
-        #  {"mentors": {"mentors": [... ]}, "holidays": {"holidays": [... ]}, "postcards": {"postcards": [... ]}}
         if "mentors" in response_data and isinstance(response_data["mentors"], dict) and "mentors" in response_data["mentors"]:
             mentors = response_data["mentors"]["mentors"]
         elif "mentors" in response_data and isinstance(response_data["mentors"], list):
@@ -47,7 +45,6 @@ def process_response_data(response_data):
             holidays = response_data["holidays"]
 
     elif isinstance(response_data, list):
-        # Проверка на ключи [{}, {}, {}] 
         for item in response_data:
             if "tg_username" in item:
                 mentors.append(item)
