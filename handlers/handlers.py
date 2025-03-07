@@ -2,12 +2,15 @@ from telegram import KeyboardButton, ParseMode, ReplyKeyboardMarkup, Update
 from telegram.error import BadRequest, TelegramError, Unauthorized
 from telegram.ext import CallbackContext
 
-from utils.get_format_name import first_name, format_long_name
-from utils.get_role import start_role
-from data.data_fetcher import get_all_data
+from loads.response_data import response_data
+from utils.format_long_name import format_long_name
+from utils.start_role import start_role
+from utils.insert_name import insert_name
+from utils.long_message import long_message
 
 
 def handle_errors(update: Update, context: CallbackContext, error: Exception) -> None:
+
     if isinstance(error, BadRequest):
         update.message.reply_text("Ошибка: пользователь не найден")
     elif isinstance(error, Unauthorized):
@@ -19,10 +22,9 @@ def handle_errors(update: Update, context: CallbackContext, error: Exception) ->
 def handle_start(update: Update, context: CallbackContext) -> None:
     username = update.effective_user.username
     role = start_role(username)
-
     keyboard = [
         [KeyboardButton('Показать менторов')],
-        [KeyboardButton('Показать открытки')]
+        [KeyboardButton('Показать открытки'), KeyboardButton('Показать праздники')]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -33,16 +35,37 @@ def handle_start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(welcome_message, reply_markup=reply_markup)
 
 
-def handle_mentors(update: Update, context: CallbackContext) -> None:
-    mentors_data = get_all_data('mentors')
-    if isinstance(mentors_data, list):  # Если вернулся список вместо словаря
+def handle_holidays(update: Update, context: CallbackContext) -> None:
+    holidays_data = response_data('holidays')
+
+    if isinstance(holidays_data, list):
         update.message.reply_text("Произошла ошибка при получении данных.")
     else:
-        mentors = mentors_data.get('mentors_list', [])
+        holidays = holidays_data.get('holidays', [])
+        if holidays:
+            text = "*Список праздников:*\n\n"
+            for i, holiday in enumerate(holidays, start=1):
+                text += f"{i}. *{holiday.get('name')}*:  {holiday.get('name_ru')}\n"
+            messages = long_message(text)
+            for message in messages:
+                update.message.reply_text(text=message, parse_mode=ParseMode.MARKDOWN)
+            # хранения праздников
+            context.user_data['holidays'] = holidays
+            context.user_data['awaiting_holiday'] = True
+        else:
+            update.message.reply_text("Список праздников пуст.\nПовторите попытку позже.")
+
+
+def handle_mentors(update: Update, context: CallbackContext) -> None:
+    mentors_data = response_data('mentors')
+    if isinstance(mentors_data, list):
+        update.message.reply_text("Произошла ошибка при получении данных.")
+    else:
+        mentors = mentors_data.get('mentors', [])
         if mentors:
             text = "🌟 *Наши менторы:*\n\n"
             for i, mentor in enumerate(mentors, start=1):
-                full_name = mentor.get('name', '')
+                full_name = mentor.get('name')
                 formatted_name = format_long_name(full_name)
                 tg_id = mentor.get('tg_username')
                 text += f"✨ *{i}.* {formatted_name} ([{tg_id}](https://t.me/{tg_id[1:]}))\n"
@@ -63,19 +86,21 @@ def handle_mentors(update: Update, context: CallbackContext) -> None:
 
 
 def handle_poscards(update: Update, context: CallbackContext) -> None:
-    cards_data = get_all_data('postcards')
-    if isinstance(cards_data, list):  # Если вернулся список вместо словаря
+    cards_data = response_data('postcards')
+    if isinstance(cards_data, list):
         update.message.reply_text("Произошла ошибка при получении данных.")
     else:
-        cards = cards_data.get('postcards_list', [])
+        cards = cards_data.get('postcards', [])
         if cards:
             text = "*Выберите номер открытки для отправки:*\n\n"
             for i, card in enumerate(cards, start=1):
-                text += f"{i}. *{card.get('name')}* {card.get('body')}\n"
+                text += f"{i}. *{card.get('name_ru')}* {card.get('body')}\n"
+            messages = long_message(text)
+            for message in messages:
+                update.message.reply_text(text=message, parse_mode=ParseMode.MARKDOWN)
             # хранение открыток
             context.user_data['available_cards'] = cards
             context.user_data['awaiting_card'] = True
-            update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
         else:
             update.message.reply_text("Список открыток пуст.\nПовторите попытку позже.")
 
@@ -96,7 +121,7 @@ def handle_mentor_choice(update: Update, context: CallbackContext) -> None:
 
 
 def handle_card_choice(update: Update, context: CallbackContext) -> None:
-    message_text = update.message.text  # TODO: Если надо выбрать несколько ментеров для поздравления?
+    message_text = update.message.text
     selected_card = None
 
     if message_text.isdigit():
@@ -108,11 +133,12 @@ def handle_card_choice(update: Update, context: CallbackContext) -> None:
             selected_mentor = context.user_data.get('selected_mentor')
             if selected_mentor:
                 try:
-                    name = first_name(selected_mentor['name'])
-                    text = f"{name},\n{selected_card['body']}"
+                    first_name = selected_mentor['name']['first']
+                    text = insert_name(selected_card['body'], first_name)
                     context.bot.send_message(
                         chat_id=selected_mentor['tg_chat_id'],
-                        text=text
+                        text=text,
+                        parse_mode=ParseMode.MARKDOWN
                     )
                     update.message.reply_text("Открытка отправлена!")
                 except TelegramError as e:
@@ -133,6 +159,8 @@ def handle_message(update: Update, context: CallbackContext) -> None:
         handle_mentors(update, context)
     elif text == 'Показать открытки':
         handle_poscards(update, context)
+    elif text == 'Показать праздники':
+        handle_holidays(update, context)
     elif context.user_data.get('awaiting_mentor'):
         handle_mentor_choice(update, context)
     elif context.user_data.get('awaiting_card'):

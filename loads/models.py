@@ -1,22 +1,27 @@
 from pydantic import BaseModel
 
 
+class Name(BaseModel):
+    first: str
+    second: str
+
+
 class Mentor(BaseModel):
     id: int
-    name: str
+    name: Name
     tg_username: str
     tg_chat_id: int
     bday: str | None = None
 
     class Config:
-        extra = "ignore"    # Игнорировать дополнительные поля STORY-55
+        extra = "ignore"
 
 
 class Postcard(BaseModel):
     id: int
-    name: str
+    name_ru: str | None = None
     body: str
-    holidayId: str | None = None
+    holidayId: str
 
     class Config:
         extra = "ignore"
@@ -32,9 +37,9 @@ class Holiday(BaseModel):
 
 
 class ResponseData(BaseModel):
-    mentors: list[Mentor] = []
-    postcards: list[Postcard] = []
-    holidays: list[Holiday] = []
+    mentors: list[Mentor] = None
+    postcards: list[Postcard] = None
+    holidays: list[Holiday] = None
 
     class Config:
         extra = "ignore"
