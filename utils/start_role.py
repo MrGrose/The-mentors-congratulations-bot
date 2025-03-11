@@ -2,6 +2,7 @@ from libs.api_client.api_requests import response_mentors
 
 
 def start_role(chat_id: str) -> str:
+    """Определяет роль пользователя (ментор или ученик) и возвращает приветственное сообщение."""
     is_mentor = False
     mentors = response_mentors()
     if mentors:
