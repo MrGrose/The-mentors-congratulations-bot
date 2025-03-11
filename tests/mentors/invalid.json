@@ -1,0 +1,11 @@
+{
+      "mentors": [
+        {"id":1,"name":{"first":"Евгений","second":"Devman"},"tg_username":"@e","tg_chat_id":2321,"bday":"1991-02-23"},
+        {"id":2,"name":{"first":"Ильмир","second":"Devman"},"tg_username":"@ilmir","tg_chat_id":32},
+        {"id":3,"name":{"first":"Нурбек","second":"Devman"},"tg_username":"@nurbek","tg_chat_id":123,"bday":"1991-02-23"},
+        {"id":4,"name":{"first":"Катя","second":"Иванова"},"tg_username":"@kat","tg_chat_id":123},
+        {"id":5,"name":{"first":"Иван","second":" Петряков"},"tg_username":"@i_pet","bday":"1991-02-23","tg_chat_id":123},
+        {"id":6,"name":{"first":"Роман","second":"Иванов"},"bday":"1995-09-01","tg_chat_id":312341} 
+      ]
+    "extra": // забыл добавить запятую и неправильно добавили ключ
+  }
