@@ -94,8 +94,8 @@ def handle_postcards(update: Update, context: CallbackContext, cards: list[Postc
 
     if cards:
         text = "*Выберите номер открытки для отправки:*\n\n"
-        for i, card in enumerate(cards, start=1):
-            text += f"{i}. *{card.name_ru}* {card.body}\n"
+        for num, card in enumerate(cards, start=1):
+            text += f"{num}. *{card.name_ru}* {card.body}\n"
         messages = long_message(text)
         for message in messages:
             update.message.reply_text(
