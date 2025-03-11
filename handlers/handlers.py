@@ -42,9 +42,7 @@ def handle_start(update: Update, context: CallbackContext) -> None:
         if user is None:
             update.message.reply_text("Ошибка: пользователь не найден")
             return
-
-        username = user.username
-        role = start_role(username)
+        role = start_role(user.username)
         keyboard = [
             [KeyboardButton('Показать менторов'),
              KeyboardButton('Показать открытки')]
