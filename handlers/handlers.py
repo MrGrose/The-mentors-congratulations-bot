@@ -12,6 +12,7 @@ from utils.start_role import start_role
 
 
 def handle_errors(update: Update, context: CallbackContext, error: Exception) -> None:
+    """Обрабатывает ошибки, возникающие во время выполнения запросов."""
     if isinstance(error, BadRequest):
         update.message.reply_text(
             "Ошибка: пользователь не найден. "
@@ -37,6 +38,7 @@ def handle_errors(update: Update, context: CallbackContext, error: Exception) ->
 
 
 def handle_start(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает команду `/start` и отправляет приветственное сообщение."""
     try:
         user = update.effective_user
         if user is None:
@@ -59,17 +61,17 @@ def handle_start(update: Update, context: CallbackContext) -> None:
 
 
 def handle_mentors(update: Update, context: CallbackContext, mentors: list[Mentor]) -> None:
+    """Отображает список менторов и запрашивает выбор ментора для отправки открытки."""
     if context.user_data is None:
         context.user_data = {}
 
     if mentors:
-        text = "\n".join([
-            "🌟 *Наши менторы:*",
-            *[
-                f"✨ *{num}.* {format_long_name(mentor.name)} ([{mentor.tg_username}](https://t.me/{mentor.tg_username[1:]}))"
-                for num, mentor in enumerate(mentors, start=1)
-            ]
-        ])
+        text = "\n".join(
+            ["🌟 *Наши менторы:*", *[
+                f"✨ *{num}.* {(
+                    format_long_name(mentor.name))} ([{mentor.tg_username}](https://t.me/{mentor.tg_username[1:]}))"
+                for num, mentor in enumerate(mentors, start=1)]]
+            )
         context.user_data['mentors'] = mentors
         context.user_data['awaiting_mentor'] = True
         update.message.reply_text(
@@ -86,6 +88,7 @@ def handle_mentors(update: Update, context: CallbackContext, mentors: list[Mento
 
 
 def handle_postcards(update: Update, context: CallbackContext, cards: list[Postcard]) -> None:
+    """Отображает список открыток и запрашивает выбор открытки для отправки."""
     if context.user_data is None:
         context.user_data = {}
 
@@ -106,6 +109,7 @@ def handle_postcards(update: Update, context: CallbackContext, cards: list[Postc
 
 
 def handle_mentor_choice(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает выбор ментора и запрашивает открытку для отправки."""
     if context.user_data is None:
         context.user_data = {}
 
@@ -125,6 +129,7 @@ def handle_mentor_choice(update: Update, context: CallbackContext) -> None:
 
 
 def handle_card_choice(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает выбор открытки и отправляет ее выбранному ментору."""
     if context.user_data is None:
         context.user_data = {}
 
@@ -163,16 +168,19 @@ def handle_card_choice(update: Update, context: CallbackContext) -> None:
 
 
 def handle_show_mentors(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает запрос на отображение списка менторов."""
     mentors_data = response_mentors()
     handle_mentors(update, context, mentors_data)
 
 
 def handle_show_postcards(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает запрос на отображение списка открыток."""
     cards_data = response_postcards()
     handle_postcards(update, context, cards_data)
 
 
 def handle_message(update: Update, context: CallbackContext) -> None:
+    """Обрабатывает текстовые сообщения."""
     try:
         if context.user_data is None:
             context.user_data = {}
