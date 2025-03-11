@@ -62,6 +62,7 @@ class PostcardsData(BaseModel):
 
 
 def handle_error_response(func: Callable) -> Callable:
+    """Декоратор для обработки ошибок в функциях, работающих с API запросами."""
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
@@ -104,6 +105,7 @@ def handle_error_response(func: Callable) -> Callable:
 
 @handle_error_response
 def response_postcards() -> list[Postcard]:
+    """Получает список открыток с сервера."""
     url = 'https://my-json-server.typicode.com/devmanorg/congrats-mentor/postcards'
 
     response = httpx.get(url)
@@ -114,6 +116,7 @@ def response_postcards() -> list[Postcard]:
 
 @handle_error_response
 def response_mentors() -> list[Mentor]:
+    """Получает список ментеров с сервера."""
     url = 'https://my-json-server.typicode.com/devmanorg/congrats-mentor/mentors'
 
     response = httpx.get(url)
