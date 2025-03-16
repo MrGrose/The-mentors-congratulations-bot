@@ -1,7 +1,0 @@
-{
-    "mentors": [
-        {"id":1,"name":{"first":"Евгений","second":"Devman"},"tg_username":"@eu","tg_chat_id":2321,"bday":"1991-02-23"},
-        {"id":2,"name":{"first":"Ильмир","second":"Devman"},"tg_username":"@il","tg_chat_id":32},
-        {"id":3,"name":{"first":"Роман","second":"Пер"},"tg_username":"@ro","tg_chat_id":123,"bday":"1991-02-23"}
-      ]
-  }
