@@ -69,9 +69,7 @@ def handle_error_response(func: Callable) -> Callable:
             return func(*args, **kwargs)
 
         except JSONDecodeError as json_err:
-            raise ServerError(
-                "Ошибка на стороне сервера: невалидный JSON"
-            ) from json_err
+            raise ServerError("Ошибка на стороне сервера: невалидный JSON") from json_err
 
         except httpx.RequestError as req_err:
             if isinstance(req_err, httpx.ConnectError):
@@ -86,13 +84,8 @@ def handle_error_response(func: Callable) -> Callable:
                 403: "Доступ запрещен",
                 404: "Ресурс не найден",
             }
-            error_message = error_messages.get(
-                http_err.response.status_code, "Неизвестная ошибка"
-            )
-            raise ServerError(
-                "Ошибка на стороне сервера: "
-                f"{http_err.response.status_code} - {error_message}"
-            ) from http_err
+            error_message = error_messages.get(http_err.response.status_code, "Неизвестная ошибка")
+            raise ServerError(f"Ошибка на стороне сервера: {http_err.response.status_code} - {error_message}") from http_err
 
         except ValidationError as val_err:
             raise ResponseFormatError("Ошибка формата ответа") from val_err
@@ -104,22 +97,20 @@ def handle_error_response(func: Callable) -> Callable:
 
 
 @handle_error_response
-def response_postcards() -> list[Postcard]:
+def response_postcards(url: str) -> dict[str, Any]:
     """Получает список открыток с сервера."""
-    url = 'https://my-json-server.typicode.com/devmanorg/congrats-mentor/postcards'
 
     response = httpx.get(url)
     response.raise_for_status()
     validated_data = PostcardsData(**response.json())
-    return validated_data.postcards
+    return validated_data.model_dump()
 
 
 @handle_error_response
-def response_mentors() -> list[Mentor]:
+def response_mentors(url: str) -> dict[str, Any]:
     """Получает список ментеров с сервера."""
-    url = 'https://my-json-server.typicode.com/devmanorg/congrats-mentor/mentors'
 
     response = httpx.get(url)
     response.raise_for_status()
-    validated_data = MentorsData(**response.json())
-    return validated_data.mentors
+    validated_data = MentorsData(**response.json()) 
+    return validated_data.model_dump()

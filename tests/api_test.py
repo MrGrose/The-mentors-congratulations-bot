@@ -5,7 +5,7 @@ app = FastAPI()
 
 def read_file(path: str) -> str:
     """Читает JSON файл."""
-    with open(path, 'r', encoding='utf-8', errors='ignore') as file:
+    with open(path, "r", encoding="utf-8", errors="ignore") as file:
         return file.read()
 
 
