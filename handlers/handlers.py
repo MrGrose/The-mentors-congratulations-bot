@@ -57,9 +57,11 @@ def handle_errors(update: Update, context: CallbackContext, error: Exception) ->
 
 
 def handle_start(update: Update, context: CallbackContext, mentors_url: str, postcards_url: str) -> None:
-    """Обрабатывает команду `/start` и отправляет приветственное сообщение.
+    """
+    Обрабатывает команду `/start` и отправляет приветственное сообщение.
 
-        Восстанавливает состояние после остановки.
+    Восстанавливает состояние после остановки.
+
     """
     try:
         if context.user_data is None:
@@ -261,7 +263,6 @@ def handle_show_postcards(update: Update, context: CallbackContext, postcards_ur
 
 def handle_message(update: Update, context: CallbackContext, mentors_url: str, postcards_url: str) -> None:
     """Обрабатывает текстовые сообщения."""
-
     try:
         if context.user_data is None:
             context.user_data = {}
