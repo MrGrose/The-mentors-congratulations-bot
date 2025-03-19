@@ -1,4 +1,5 @@
 import logging
+
 from environs import Env
 from telegram.ext import (
     CommandHandler,
@@ -7,12 +8,14 @@ from telegram.ext import (
     PicklePersistence,
     Updater
 )
+
 from libs.arg_parser import create_parser
 from handlers.handlers import (
     handle_errors,
     handle_message,
     handle_start
 )
+
 
 logging.basicConfig(
     format="[%(asctime)s] - %(levelname)s - %(funcName)s - %(message)s",
@@ -22,16 +25,13 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
-
-    mentors_url, postcards_url, enter_tg_token = create_parser()
-
-    persistence = PicklePersistence(filename="id", single_file=False)
-
     env = Env()
     env.read_env()
-    tg_token = enter_tg_token if enter_tg_token else env.str("TG_TOKEN")
-    updater = Updater(tg_token, persistence=persistence)
+    mentors_url, postcards_url, tg_token_input = create_parser()
+    tg_token = tg_token_input if tg_token_input else env.str("TG_TOKEN")
+    persistence = PicklePersistence(filename="id", single_file=False)
 
+    updater = Updater(tg_token, persistence=persistence)
     dispatcher = updater.dispatcher
 
     logger.info("Бот запускается...")

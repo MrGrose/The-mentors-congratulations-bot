@@ -1,4 +1,5 @@
 import logging
+
 from telegram import (
     KeyboardButton,
     ParseMode,
@@ -15,13 +16,13 @@ from telegram.ext import CallbackContext
 from libs.api_client.api_requests import (
     ResponseFormatError,
     ServerError,
-    response_mentors,
-    response_postcards
+    get_mentors,
+    get_postcards
 )
 from libs.utils import (
     format_long_name,
     insert_name,
-    long_message,
+    message_splitter,
     start_role
 )
 
@@ -176,7 +177,7 @@ def handle_postcards(update: Update, context: CallbackContext, cards_data: dict)
             "awaiting_card": True,
             "last_action": "выбор открытки"
         })
-        for message in long_message(text):
+        for message in message_splitter(text):
             update.message.reply_text(
                 text=message,
                 parse_mode=ParseMode.MARKDOWN
@@ -251,13 +252,13 @@ def handle_card_choice(update: Update, context: CallbackContext) -> None:
 
 def handle_show_mentors(update: Update, context: CallbackContext, mentors_url: str) -> None:
     """Обрабатывает запрос на отображение списка менторов."""
-    mentors_data = response_mentors(mentors_url)
+    mentors_data = get_mentors(mentors_url)
     handle_mentors(update, context, mentors_data)
 
 
 def handle_show_postcards(update: Update, context: CallbackContext, postcards_url: str) -> None:
     """Обрабатывает запрос на отображение списка открыток."""
-    cards_data = response_postcards(postcards_url)
+    cards_data = get_postcards(postcards_url)
     handle_postcards(update, context, cards_data)
 
 

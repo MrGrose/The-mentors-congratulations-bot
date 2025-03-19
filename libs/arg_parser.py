@@ -1,42 +1,43 @@
 import argparse
+
 from typing import Any
 
 URL_CONFIG = {
     "empty_list": [
         "http://127.0.0.1:8002/mentors_no_items",
-        "http://127.0.0.1:8002/postcards_no_items"
+        "http://127.0.0.1:8002/postcards_no_items",
         ],
     "large_list": [
         "http://127.0.0.1:8002/thirty_mentors",
-        "http://127.0.0.1:8002/postcards_130"
+        "http://127.0.0.1:8002/postcards_130",
         ],
     "standard_list": [
         "http://127.0.0.1:8002/3_mentors", 
-        "http://127.0.0.1:8002/postcards_5"
+        "http://127.0.0.1:8002/postcards_5",
         ],
     "long_data": [
         "http://127.0.0.1:8002/long_name",
-        "http://127.0.0.1:8002/long_postcard"
+        "http://127.0.0.1:8002/long_postcard",
         ],
     "invalid_json": [
         "http://127.0.0.1:8002/mentors_invalid",
-        "http://127.0.0.1:8002/postcards_invalid"
+        "http://127.0.0.1:8002/postcards_invalid",
         ],
     "not_match_scheme": [
         "http://127.0.0.1:8002/mentors_not_shema",
-        "http://127.0.0.1:8002/postcards_not_shema"
+        "http://127.0.0.1:8002/postcards_not_shema",
         ],
     "excess_data": [
         "http://127.0.0.1:8002/too_much_mentors",
-        "http://127.0.0.1:8002/too_much_postcards"
+        "http://127.0.0.1:8002/too_much_postcards",
         ],
     "mentor_status": [
         "http://127.0.0.1:8002/mentor_info",
-        "http://127.0.0.1:8002/name_template"
+        "http://127.0.0.1:8002/name_template",
         ],
     "default": [
         "https://my-json-server.typicode.com/devmanorg/congrats-mentor/mentors",
-        "https://my-json-server.typicode.com/devmanorg/congrats-mentor/postcards"
+        "https://my-json-server.typicode.com/devmanorg/congrats-mentor/postcards",
         ]
 }
 
@@ -59,7 +60,8 @@ def create_parser() -> tuple[str, str, Any]:
         default: Возвращает не тестовые URL's при отсутствии ключа
 
         Формат использования: python main.py [key] [--token YOUR_TOKEN]
-        """)
+        """
+    )
 
     parser.add_argument(
         "key",

@@ -1,24 +1,24 @@
-from libs.api_client.api_requests import response_mentors
+from libs.api_client.api_requests import get_mentors
 
 
 def format_long_name(name: dict) -> str:
     """Форматирует полное имя, сокращая его, если первое имя слишком длинное."""
-    name_first = name.get("first")
-    name_second = name.get("second")
+    first_name = name.get("first")
+    last_name = name.get("second")
 
-    if not name_first:
+    if not first_name:
         raise ValueError("Отсутствие имени")
 
-    if len(name_first) >= 15:
-        return f"{" ".join(name_first.split()[:2])}... {name_second}"
+    if len(first_name) >= 15:
+        return f"{" ".join(first_name.split()[:2])}... {last_name}"
     else:
-        return name_first+" "+name_second
+        return first_name+" "+last_name
 
 
 def start_role(chat_id: str, url: str) -> str:
     """Определяет роль пользователя (ментор или ученик) и возвращает приветственное сообщение."""
     is_mentor = False
-    mentors = response_mentors(url)
+    mentors = get_mentors(url)
     if mentors:
         for user in mentors.get("mentors", []):
             if user.get("tg_username") and chat_id.lstrip("@") == user.get("tg_username").lstrip("@"):
@@ -32,11 +32,11 @@ def start_role(chat_id: str, url: str) -> str:
         return f"Приветствую ученик: {chat_id}"
 
 
-def long_message(text: str) -> list:
+def message_splitter(text: str) -> list:
     """Разбивает длинное сообщение на части по 4096 символов."""
     messages = []
-    for x in range(0, len(text), 4096):
-        messages.append(text[x:x + 4096])
+    for start_index in range(0, len(text), 4096):
+        messages.append(text[start_index:start_index + 4096])
     return messages
 
 
@@ -50,7 +50,7 @@ def insert_name(body: str, mentor_name: str) -> str:
     if "#name" in body:
         return body.replace("#name", mentor_name)
     else:
-        for i, char in enumerate(body):
+        for char_index, char in enumerate(body):
             if char.isalpha():
-                return body[:i] + " " + mentor_name + ", " + body[i:]
+                return body[:char_index] + " " + mentor_name + ", " + body[char_index:]
         return mentor_name + ", " + body

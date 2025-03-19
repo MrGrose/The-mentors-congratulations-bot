@@ -1,9 +1,9 @@
+import httpx
+
 from functools import wraps
 from json.decoder import JSONDecodeError
 from typing import Any, Callable, List, Optional
-
-import httpx
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, Field
 
 
 class NetworkError(Exception):
@@ -31,13 +31,14 @@ class Mentor(BaseModel):
     name: Name
     tg_username: str
     tg_chat_id: int
-    bday: Optional[str] = None
+    birthday: Optional[str] = Field(None, alias='bday') 
 
     class Config:
         extra = "ignore"
+        allow_population_by_field_name = True
 
 
-class MentorsData(BaseModel):
+class MentorData(BaseModel):
     mentors: List[Mentor]
 
     class Config:
@@ -46,15 +47,16 @@ class MentorsData(BaseModel):
 
 class Postcard(BaseModel):
     id: int
-    holidayId: str
+    holiday_name: str = Field(alias="holidayId")
     name_ru: str
     body: str
 
     class Config:
         extra = "ignore"
+        allow_population_by_field_name = True
 
 
-class PostcardsData(BaseModel):
+class PostcardData(BaseModel):
     postcards: List[Postcard]
 
     class Config:
@@ -97,20 +99,20 @@ def handle_error_response(func: Callable) -> Callable:
 
 
 @handle_error_response
-def response_postcards(url: str) -> dict[str, Any]:
+def get_postcards(url: str) -> dict[str, Any]:
     """Получает список открыток с сервера."""
 
     response = httpx.get(url)
     response.raise_for_status()
-    validated_data = PostcardsData(**response.json())
+    validated_data = PostcardData(**response.json())
     return validated_data.model_dump()
 
 
 @handle_error_response
-def response_mentors(url: str) -> dict[str, Any]:
+def get_mentors(url: str) -> dict[str, Any]:
     """Получает список ментеров с сервера."""
 
     response = httpx.get(url)
     response.raise_for_status()
-    validated_data = MentorsData(**response.json()) 
+    validated_data = MentorData(**response.json()) 
     return validated_data.model_dump()
